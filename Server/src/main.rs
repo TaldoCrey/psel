@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::fs;
 use std::net::TcpListener;
 use std::net::TcpStream;
@@ -70,7 +69,7 @@ fn register_with_proxy(secret: &str) -> Result<(), String> {
                 Err(format!("Secret Key registration have failed. Proxy's answer: {}", response_str))
             }
         },
-        Err(e) => Err(format!("Connection with proxy have failed!"))
+        Err(_) => Err(format!("Connection with proxy have failed!"))
     }
 }
 
@@ -83,6 +82,7 @@ fn register_with_proxy(secret: &str) -> Result<(), String> {
 /// * `uri` - Request's path.
 /// * `host` - Request's host.
 /// * `body` - Request's body.
+#[allow(dead_code)]
 struct Request {
     signature: String,
     method: String,
@@ -129,9 +129,11 @@ fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
                             proxy_singature, method, path, host, body));
     
     if proxy_singature == secret.as_str() {
-        route(request);
+        report(format!("Request Signature Validated >> Routing"));
+        route(request, stream);
     } else {
-        let contents = fs::read_to_string("403.html").unwrap();
+        report(format!("Request Signature is invalid >> Sending 403 Response"));
+        let contents = fs::read_to_string("./pages/403.html").unwrap();
 
         let response = format!(
             "HTTP/1.1 403 FORBIDDEN\r\nContent-Length: {}\r\n\r\n{}",
@@ -145,8 +147,61 @@ fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
 
 }
 
-fn route(request: Request) {
+fn route(request: Request, mut stream: TcpStream) {
+    if request.method == "GET" {
+        let file = match &request.uri {
+            s if s.contains("?") => {
+                let (_, file_var_and_value) = request.uri.split_once("?").unwrap();
+                let (_, file_name) = file_var_and_value.split_once("=").unwrap();
+                file_name.to_string()
+            },
+            _ => {
+                let file_name = request.uri.replacen("/", "", 1);
+                file_name.to_string()
+            }
+        };
 
+        let (content_type, folder) = match file.as_str() {
+            s if s.contains("html") || s == "" => {
+                ("text/html", "pages")
+            },
+            s if s.contains("css") => {
+                ("text/css", "pages")
+            },
+            s if s.contains("jpg") => {
+                ("image/jpeg", "data")
+            },
+            s if s.contains("png") => {
+                ("image/png", "data")
+            }
+            _ => ("text/plain", "data")
+        };
+
+        let path = format!("./{}/{}", folder, file);
+
+        let filepath = Path::new(path.as_str());
+        let response;
+        if filepath.exists() {
+            let contents = fs::read_to_string(filepath).unwrap();
+            
+            response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n{}",
+                content_type,
+                contents.len(),
+                contents
+            );
+        } else {
+            let contents = fs::read_to_string("./pages/404.html").unwrap();
+
+            response = format!(
+                "HTTP/1.1 404 NOT FOUND\r\nContent-Length: {}\r\n\r\n{}",
+                contents.len(),
+                contents
+            );
+        }
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
+    }
 }
 
 fn main() {
