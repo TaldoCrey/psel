@@ -1,4 +1,3 @@
-use std::char::ToLowercase;
 use std::fs;
 use std::net::TcpListener;
 use std::net::TcpStream;
@@ -92,6 +91,25 @@ struct Request {
     body: String
 }
 
+fn parse(request: String) -> Request {
+    let proxy_signature_line = request.lines().nth(0).unwrap();
+    let (_, proxy_singature) = proxy_signature_line.split_once(": ").unwrap();
+    let main_header = request.lines().skip(1).next().unwrap();
+    let mut parts = main_header.split_whitespace();
+    let method = parts.next().unwrap();
+    let path = parts.next().unwrap();
+    let host = "0.0.0.0:2006";
+    let (_, body)  = request.split_once("\r\n\r\n").unwrap();
+
+    Request {
+        method: method.to_string(),
+        signature: proxy_singature.to_string(),
+        uri: path.to_string(),
+        host: host.to_string(),
+        body: body.to_string()
+    }
+}
+
 /// Handles the connection of a stream
 /// 
 /// # Arguments
@@ -108,28 +126,13 @@ fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
 
     let request_string = String::from_utf8_lossy(&buffer[..]);
 
-    let proxy_signature_line = request_string.lines().nth(0).unwrap();
-    let (_, proxy_singature) = proxy_signature_line.split_once(": ").unwrap();
-    let main_header = request_string.lines().skip(1).next().unwrap();
-    let mut parts = main_header.split_whitespace();
-    let method = parts.next().unwrap();
-    let path = parts.next().unwrap();
-    let host = "0.0.0.0:2006";
-    let (_, body)  = request_string.split_once("\r\n\r\n").unwrap();
-
-    let request = Request {
-        method: method.to_string(),
-        signature: proxy_singature.to_string(),
-        uri: path.to_string(),
-        host: host.to_string(),
-        body: body.to_string()
-    };
+    let request = parse(request_string.to_string());
 
     report(format!("Received new request => \nSignature: {}\n
                             Method: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
-                            proxy_singature, method, path, host, body));
+                            request.signature, request.method, request.uri, request.host, request.body));
     
-    if proxy_singature == secret.as_str() {
+    if request.signature == secret.as_str() {
         report(format!("Request Signature Validated >> Routing"));
         route(request, stream);
     } else {
