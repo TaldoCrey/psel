@@ -1,3 +1,4 @@
+use std::char::ToLowercase;
 use std::fs;
 use std::net::TcpListener;
 use std::net::TcpStream;
@@ -147,6 +148,58 @@ fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
 
 }
 
+fn escape_html(text: &str) -> String{
+    let mut output = String::new();
+
+    for c in text.chars() {
+        match c {
+            '&' => output.push_str("&amp;"),
+            '<' => output.push_str("&lt;"),
+            '>' => output.push_str("&gt;"),
+            '"' => output.push_str("&quot;"),
+            _ => output.push(c)
+        }
+    }
+    output
+}
+
+fn fill_template(html_template: &str, placeholder: &str, data: &str) -> String {
+    let safe_data = escape_html(data);
+
+    html_template.replace(placeholder, &safe_data)
+}
+
+fn list_files() -> String {
+    let path = Path::new("./data");
+    let all_files = fs::read_dir(path).unwrap();
+
+    let mut file_names = Vec::new();
+
+    for file in all_files {
+        let file = file.unwrap();
+        let file_type = file.file_type().unwrap();
+
+        if file_type.is_file() {
+            let file_os_name = file.file_name();
+            let file_name = file_os_name.to_string_lossy().into_owned();
+            file_names.push(file_name);
+        }
+    }
+
+    file_names.sort();
+    let all_names = file_names.join("\n");
+
+    let index_content = fs::read_to_string("./pages/index.html").unwrap();
+
+    fill_template(index_content.as_str(), "{{NOMES_DOS_ARQUIVOS}}", &all_names)
+
+}
+
+/// Routes a request and send it back to the stream
+/// 
+/// # Arguments
+/// * `request: Request` - Request that will be routed.
+/// * `mut stream: TcpStream` - Stream that holds connection.
 fn route(request: Request, mut stream: TcpStream) {
     if request.method == "GET" {
         let file = match &request.uri {
@@ -174,7 +227,7 @@ fn route(request: Request, mut stream: TcpStream) {
             s if s.contains("png") => {
                 ("image/png", "data")
             }
-            _ => ("text/plain", "data")
+            _ => ("text/html", "data")
         };
 
         let path = format!("./{}/{}", folder, file);
@@ -182,7 +235,12 @@ fn route(request: Request, mut stream: TcpStream) {
         let filepath = Path::new(path.as_str());
         let response;
         if filepath.exists() {
-            let contents = fs::read_to_string(filepath).unwrap();
+            let contents = match file {
+                s if s == "" => {
+                    list_files()
+                },
+                _ => fs::read_to_string(filepath).unwrap()
+            };
             
             response = format!(
                 "HTTP/1.1 200 OK\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n{}",

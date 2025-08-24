@@ -1,0 +1,5 @@
+Olá, meu nome é Renan Machado Santos, e fui eu quem desenvolveu esse servidor.
+
+Foram aproximadamente 10 horas seguidas de código hoje (24/08/2025).
+
+Espero que tudo esteja funcionando bem. =D
