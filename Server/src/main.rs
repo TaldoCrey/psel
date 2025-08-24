@@ -148,6 +148,10 @@ fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
 
 }
 
+/// Secure texts that may be send in a html file
+/// 
+/// # Arguments
+/// * `text: &str` - Text that will be secured.
 fn escape_html(text: &str) -> String{
     let mut output = String::new();
 
@@ -163,12 +167,19 @@ fn escape_html(text: &str) -> String{
     output
 }
 
+/// Replace a html file template by actually data
+/// 
+/// # Arguments
+/// * `html_template: &str` - Html file content that will suffer a replacement.
+/// * `placeholder: &str` - Local in the file where data will be placen.
+/// * `data: &str` - Data that will substitute the placeholder.
 fn fill_template(html_template: &str, placeholder: &str, data: &str) -> String {
     let safe_data = escape_html(data);
 
     html_template.replace(placeholder, &safe_data)
 }
 
+/// List all files in ````./data`` folder
 fn list_files() -> String {
     let path = Path::new("./data");
     let all_files = fs::read_dir(path).unwrap();
