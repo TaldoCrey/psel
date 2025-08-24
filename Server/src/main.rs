@@ -57,9 +57,10 @@ fn register_with_proxy(secret: &str) -> Result<(), String> {
             );
 
             stream.write(request.as_bytes()).unwrap();
+            stream.flush().unwrap();
 
             let mut response_buffer = [0; 512];
-            stream.read(&mut response_buffer).map_err(|e|e.to_string());
+            stream.read(&mut response_buffer).unwrap();
             let response_str = String::from_utf8_lossy(&response_buffer);
 
             if response_str.starts_with("HTTP/1.1 200 OK") {
@@ -73,8 +74,79 @@ fn register_with_proxy(secret: &str) -> Result<(), String> {
     }
 }
 
+/// Container that store request data
+/// 
+/// # Arguments
+/// All are String type:
+/// * `sigature` - Proxy's Signature.
+/// * `method` - Request's method.
+/// * `uri` - Request's path.
+/// * `host` - Request's host.
+/// * `body` - Request's body.
+struct Request {
+    signature: String,
+    method: String,
+    uri: String,
+    host: String,
+    body: String
+}
+
+/// Handles the connection of a stream
+/// 
+/// # Arguments
+/// * `mut stream: TcpStream` - Stream that holds the connection.
+/// * `secret: Arc<String>` - Smart Pointer that holds the secret-key.
+/// 
+/// # Functionality
+/// It recognizes a request, dissect it and if the request has the secret-key signature right,
+/// sends the important parts of request to be routed. If the request has not the secret-key signature right,
+/// or does not have any secret-key signature, it sends a error back.
 fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
+    let mut buffer = [0; 4096];
+    stream.read(&mut buffer).unwrap();
+
+    let request_string = String::from_utf8_lossy(&buffer[..]);
+
+    let proxy_signature_line = request_string.lines().nth(0).unwrap();
+    let (_, proxy_singature) = proxy_signature_line.split_once(": ").unwrap();
+    let main_header = request_string.lines().skip(1).next().unwrap();
+    let mut parts = main_header.split_whitespace();
+    let method = parts.next().unwrap();
+    let path = parts.next().unwrap();
+    let host = "0.0.0.0:2006";
+    let (_, body)  = request_string.split_once("\r\n\r\n").unwrap();
+
+    let request = Request {
+        method: method.to_string(),
+        signature: proxy_singature.to_string(),
+        uri: path.to_string(),
+        host: host.to_string(),
+        body: body.to_string()
+    };
+
+    report(format!("Received new request => \nSignature: {}\n
+                            Method: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
+                            proxy_singature, method, path, host, body));
     
+    if proxy_singature == secret.as_str() {
+        route(request);
+    } else {
+        let contents = fs::read_to_string("403.html").unwrap();
+
+        let response = format!(
+            "HTTP/1.1 403 FORBIDDEN\r\nContent-Length: {}\r\n\r\n{}",
+            contents.len(),
+            contents
+        );
+
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
+    }
+
+}
+
+fn route(request: Request) {
+
 }
 
 fn main() {
