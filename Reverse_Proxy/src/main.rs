@@ -66,23 +66,21 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
 
     let mut request = parse(request_string.to_string());
 
-    report(format!("Received new request => \n\
-                            Method: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
-                            request.method, request.uri, request.host, request.body));
-    
-
     if request.method == "POST" && request.uri == "/register-secret" {
         let body = request.body.trim().trim_end_matches('\0');
 
         let mut signature_key = secret_state.lock().unwrap();
         *signature_key = Some(body.to_string());
 
-        report(format!("Received server's key >>> {}", body));
+        report(format!("Received server's key >>> {}...", &body[0..5]));
 
         let response = "HTTP/1.1 200 OK\r\n\r\n";
         stream.write(response.as_bytes()).unwrap();
         stream.flush().unwrap();
     } else {
+        report(format!("Received new request => \n\
+                            Method: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
+                            request.method, request.uri, request.host, request.body));
         let signature_key_guard = secret_state.lock().unwrap();
         let signature_key = match &*signature_key_guard {
             Some(s) => s.clone(),
