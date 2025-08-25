@@ -91,7 +91,7 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
                 let response = format!(
                     "HTTP/1.1 503 SERVICE UNAVAIBLE\r\n\
                     Content-Length: {}\r\n\
-                    Content-Type: text/html, charset=\r\n\
+                    Content-Type: text/html; charset=utf-8\r\n\
                     \r\n\
                     {}",
                     contents.len(),

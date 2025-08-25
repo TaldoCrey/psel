@@ -98,18 +98,34 @@ struct Request {
 /// # Arguments
 /// * `request: String` - Request that will be processed.
 fn parse(request: String) -> Request {
-    let proxy_signature_line = request.lines().nth(0).unwrap();
-    let (_, proxy_singature) = proxy_signature_line.split_once(": ").unwrap_or(("N/A", "N/A"));
-    let main_header = request.lines().skip(1).next().unwrap();
-    let mut parts = main_header.split_whitespace();
-    let method = parts.next().unwrap();
-    let path = parts.next().unwrap();
-    let host = "0.0.0.0:2006";
-    let (_, body)  = request.split_once("\r\n\r\n").unwrap();
+    let method;
+    let path;
+    let host;
+    let body;
+    let proxy_signature;
+    if request.contains("X-Proxy-Signature") {
+        let proxy_signature_line = request.lines().nth(0).unwrap();
+        proxy_signature = proxy_signature_line.split_once(": ").unwrap_or(("N/A", "N/A")).1;
+        let main_header = request.lines().skip(1).next().unwrap();
+        let mut parts = main_header.split_whitespace();
+        method = parts.next().unwrap();
+        path = parts.next().unwrap();
+        host = "0.0.0.0:2006";
+        body = request.split_once("\r\n\r\n").unwrap().1;
+    } else {
+        proxy_signature = "N/A";
+        let main_header = request.lines().next().unwrap();
+        let mut parts = main_header.split_whitespace();
+        method = parts.next().unwrap();
+        path = parts.next().unwrap();
+        host = "0.0.0.0:2006";
+        body = request.split_once("\r\n\r\n").unwrap().1;
+    }
+    
 
     Request {
         method: method.to_string(),
-        signature: proxy_singature.to_string(),
+        signature: proxy_signature.to_string(),
         uri: path.to_string(),
         host: host.to_string(),
         body: body.to_string()
@@ -145,7 +161,7 @@ fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
         let contents = fs::read_to_string("./pages/403.html").unwrap();
 
         let response = format!(
-            "HTTP/1.1 403 FORBIDDEN\r\nContent-Length: {}\r\n\r\n{}",
+            "HTTP/1.1 403 FORBIDDEN\r\nContent-Length: {}\r\nContent-Type: text/html\r\n\r\n{}",
             contents.len(),
             contents
         );
@@ -271,7 +287,7 @@ fn route(request: Request, mut stream: TcpStream) {
             let contents = fs::read_to_string("./pages/404.html").unwrap();
 
             response = format!(
-                "HTTP/1.1 404 NOT FOUND\r\nContent-Length: {}\r\n\r\n{}",
+                "HTTP/1.1 404 NOT FOUND\r\nContent-Length: {}\r\nContent-Type: text/html\r\n{}",
                 contents.len(),
                 contents
             );
