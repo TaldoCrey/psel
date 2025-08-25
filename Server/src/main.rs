@@ -237,6 +237,7 @@ fn list_files() -> String {
 /// * `mut stream: TcpStream` - Stream that holds connection.
 fn route(request: Request, mut stream: TcpStream) {
     if request.method == "GET" {
+        report(format!("Sending to routed (GET) request a response"));
         let file = match &request.uri {
             s if s.contains("?") => {
                 let (_, file_var_and_value) = request.uri.split_once("?").unwrap();
@@ -322,6 +323,8 @@ fn main() {
     let arc_secret_key = Arc::new(secret_key);
 
     let listener =  TcpListener::bind("127.0.0.1:1445").unwrap();
+
+    report(format!("Initialized at 127.0.0.1:1445"));
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();

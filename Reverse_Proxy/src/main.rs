@@ -73,6 +73,7 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
         *signature_key = Some(body.to_string());
 
         report(format!("Received server's key >>> {}...", &body[0..5]));
+        report(format!("Sending back positive response"));
 
         let response = "HTTP/1.1 200 OK\r\n\r\n";
         stream.write(response.as_bytes()).unwrap();
@@ -148,6 +149,8 @@ fn proxy_foward(request: Request, mut stream: TcpStream) {
 
 fn main() {
     let listener = TcpListener::bind("0.0.0.0:2006").unwrap();
+
+    report(format!("Initialized at 0.0.0.0:2006"));
 
     let secret_state: SharedSecret = Arc::new(Mutex::new(None));
 
