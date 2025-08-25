@@ -2,9 +2,7 @@ use std::net::TcpListener;
 use std::net::TcpStream;
 use std::io::prelude::*;
 use std::thread;
-use std::path::Path;
 use std::sync::{Arc, Mutex};
-use sha2::{Sha256, Digest};
 
 type SharedSecret = Arc<Mutex<Option<String>>>;
 
@@ -34,6 +32,9 @@ struct Request {
     body: String
 }
 
+/// Turn a request string into a struct
+/// # Arguments
+/// * `request: String` - Request that will be processed.
 fn parse(request: String) -> Request {
     let main_header = request.lines().next().unwrap();
     let mut parts = main_header.split_whitespace();
@@ -51,7 +52,11 @@ fn parse(request: String) -> Request {
     }
 }
 
-
+/// Handles proxy's connection
+/// 
+/// # Arguments
+/// * `mut stream: TcpStream` - Stream that holds connection with client.
+/// * `secret_state: SharedSecret` - Variable that holds secret-key came from server.
 fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
     let mut buffer = [0; 4096];
     stream.read(&mut buffer).unwrap();
@@ -90,12 +95,46 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
 
         request.signature = signature_key;
 
-        proxy_route(request);
+        proxy_foward(request, stream);
     }
 }
 
-fn proxy_route(request: Request) {
-    
+/// Passes Foward a request of a client to the server
+/// 
+/// # Arguments
+/// * `request: Request` - Countainer that holds request data.
+/// * `mut stream: TcpStream` - Stream that holds connection with client.
+fn proxy_foward(request: Request, mut stream: TcpStream) {
+    if request.method == "GET" {
+        let mut server_stream = TcpStream::connect("127.0.0.1:1445").unwrap();
+        let server_request = format!(
+            "X-Proxy-Signature: {}\r\n{} {} HTTP/1.1\r\nHost: {}\r\n\r\n{}",
+            request.signature,
+            request.method,
+            request.uri,
+            request.host,
+            request.body
+        );
+        server_stream.write(server_request.as_bytes()).unwrap();
+        server_stream.flush().unwrap();
+
+        report(format!("Request passed foward"));
+
+        let mut response_buffer = [0; 4096];
+        server_stream.read(&mut response_buffer).unwrap();
+
+        report(format!("Received answer from Server >>> Passing Foward to Client"));
+
+        stream.write(&response_buffer).unwrap();
+        stream.flush().unwrap();
+    } else {
+        report(format!(
+            "Strange Request >>> Method: {} | Path: {} | Body: {}", 
+            request.method, request.uri, request.body
+        ));
+
+
+    }
 }
 
 fn main() {
