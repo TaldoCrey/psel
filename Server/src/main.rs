@@ -91,6 +91,9 @@ struct Request {
     body: String
 }
 
+/// Turn a request string into a struct
+/// # Arguments
+/// * `request: String` - Request that will be processed.
 fn parse(request: String) -> Request {
     let proxy_signature_line = request.lines().nth(0).unwrap();
     let (_, proxy_singature) = proxy_signature_line.split_once(": ").unwrap();
@@ -128,8 +131,7 @@ fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
 
     let request = parse(request_string.to_string());
 
-    report(format!("Received new request => \nSignature: {}\n
-                            Method: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
+    report(format!("Received new request => \nSignature: {}\nMethod: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
                             request.signature, request.method, request.uri, request.host, request.body));
     
     if request.signature == secret.as_str() {
