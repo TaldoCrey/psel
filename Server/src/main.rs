@@ -5,8 +5,11 @@ use std::io::prelude::*;
 use std::thread;
 use std::path::Path;
 use std::sync::Arc;
+use std::thread::sleep;
+use std::time::Duration;
 use rand::Rng;
 use sha2::{Sha256, Digest};
+use colored::*;
 
 
 /// Returns a random String
@@ -29,7 +32,7 @@ fn generate_secret_key_string(size: usize, charset: &[u8]) -> String {
 /// 
 /// * `message: String` - Message that will be printed out.
 fn report(message: String) -> () {
-    println!("[SERVER] :: {}", message);
+    println!("[{}] {} {}", "SERVER".blue(), "::".yellow(), message.truecolor(26, 164, 5));
 }
 
 /// Try to register a secret-key at proxy
@@ -96,7 +99,7 @@ struct Request {
 /// * `request: String` - Request that will be processed.
 fn parse(request: String) -> Request {
     let proxy_signature_line = request.lines().nth(0).unwrap();
-    let (_, proxy_singature) = proxy_signature_line.split_once(": ").unwrap();
+    let (_, proxy_singature) = proxy_signature_line.split_once(": ").unwrap_or(("N/A", "N/A"));
     let main_header = request.lines().skip(1).next().unwrap();
     let mut parts = main_header.split_whitespace();
     let method = parts.next().unwrap();
@@ -296,7 +299,8 @@ fn main() {
     report(format!("Secret Key Generated! >>> {}", &secret_key));
 
     while let Err(e) = register_with_proxy(&secret_key.as_str()) {
-        eprintln!("[SERVER] :: Critical Error >> {}", e);
+        eprintln!("[{}] {} {} >> {}", "SERVER".blue(), "::".yellow(), "Critical Error".red(),e);
+        sleep(Duration::new(1, 0));
     }
 
     let arc_secret_key = Arc::new(secret_key);

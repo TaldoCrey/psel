@@ -4,6 +4,7 @@ use std::net::TcpStream;
 use std::io::prelude::*;
 use std::thread;
 use std::sync::{Arc, Mutex};
+use colored::*;
 
 type SharedSecret = Arc<Mutex<Option<String>>>;
 
@@ -13,7 +14,7 @@ type SharedSecret = Arc<Mutex<Option<String>>>;
 /// 
 /// * `message: String` - Message that will be printed out.
 fn report(message: String) -> () {
-    println!("[REVERSE PROXY] :: {}", message);
+    println!("[{}] {} {}", "REVERSE PROXY".red(), "::".yellow(), message.truecolor(248, 150, 1));
 }
 /// Container that store request data
 /// 
@@ -76,7 +77,7 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
         let mut signature_key = secret_state.lock().unwrap();
         *signature_key = Some(body.to_string());
 
-        report(format!("Received server's key >>> {:?}", *signature_key));
+        report(format!("Received server's key >>> {}", body));
 
         let response = "HTTP/1.1 200 OK\r\n\r\n";
         stream.write(response.as_bytes()).unwrap();
