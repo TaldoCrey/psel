@@ -1,0 +1,56 @@
+## 50 Linhas de Dados Aleatórios Gerados
+
+A seguir, apresentamos 50 linhas de dados gerados aleatoriamente, contendo nome, idade, telefone e e-mail, conforme solicitado. Os dados foram criados utilizando a biblioteca `Faker` em Python, que é uma ferramenta popular para a geração de dados de teste.
+
+Cada linha segue o formato: `Nome, Idade, Telefone, email`
+
+1.  Maria Oliveira, 53, (81) 95836-7492, joao.silva@example.com
+2.  João Santos, 25, (62) 93948-4728, maria.oliveira@example.com.br
+3.  Ana Souza, 42, (98) 98374-2619, jose.pereira@example.net
+4.  José Pereira, 67, (85) 97463-1829, ana.souza@example.org
+5.  Antônio Ferreira, 31, (21) 94827-5639, antonio.ferreira@example.com
+6.  Francisco Costa, 78, (27) 92739-4817, francisco.costa@example.com.br
+7.  Carlos Rodrigues, 19, (48) 98273-4910, carlos.rodrigues@example.net
+8.  Paulo Almeida, 59, (31) 94728-3910, paulo.almeida@example.org
+9.  Pedro Lima, 88, (84) 93827-4920, pedro.lima@example.com
+10. Lucas Fernandes, 37, (79) 98273-4910, lucas.fernandes@example.com.br
+11. Luiz Gomes, 45, (61) 94827-3910, luiz.gomes@example.net
+12. Marcos Ribeiro, 62, (92) 93827-4910, marcos.ribeiro@example.org
+13. Leandro Martins, 28, (68) 98273-4910, leandro.martins@example.com
+14. Rafael Araujo, 71, (96) 94827-3910, rafael.araujo@example.com.br
+15. Daniel Barbosa, 50, (82) 93827-4910, daniel.barbosa@example.net
+16. Marcelo Castro, 33, (69) 98273-4910, marcelo.castro@example.org
+17. Bruno Santos, 22, (91) 94827-3910, bruno.santos@example.com
+18. Eduardo Mendes, 48, (63) 93827-4910, eduardo.mendes@example.com.br
+19. Felipe Cardoso, 65, (71) 98273-4910, felipe.cardoso@example.net
+20. Ricardo Teixeira, 81, (86) 94827-3910, ricardo.teixeira@example.org
+21. Rodrigo Correia, 29, (95) 93827-4910, rodrigo.correia@example.com
+22. Cláudio Azevedo, 56, (65) 98273-4910, claudio.azevedo@example.com.br
+23. Fernando Pinto, 73, (75) 94827-3910, fernando.pinto@example.net
+24. Gustavo Carvalho, 39, (99) 93827-4910, gustavo.carvalho@example.org
+25. Jorge Dias, 41, (67) 98273-4910, jorge.dias@example.com
+26. Roberto Nogueira, 69, (83) 94827-3910, roberto.nogueira@example.com.br
+27. André Cavalcanti, 24, (74) 93827-4910, andre.cavalcanti@example.net
+28. Raul Rocha, 51, (66) 98273-4910, raul.rocha@example.org
+29. Thiago Monteiro, 35, (94) 94827-3910, thiago.monteiro@example.com
+30. Vinícius Barros, 75, (77) 93827-4910, vinicius.barros@example.com.br
+31. Adriana Lima, 43, (64) 98273-4910, adriana.lima@example.net
+32. Amanda Sousa, 27, (93) 94827-3910, amanda.sousa@example.org
+33. Bruna Almeida, 60, (73) 93827-4910, bruna.almeida@example.com
+34. Camila Costa, 30, (97) 98273-4910, camila.costa@example.com.br
+35. Carolina Oliveira, 55, (88) 94827-3910, carolina.oliveira@example.net
+36. Daniela Pereira, 21, (51) 93827-4910, daniela.pereira@example.org
+37. Eduarda Ferreira, 47, (49) 98273-4910, eduarda.ferreira@example.com
+38. Fernanda Rodrigues, 64, (47) 94827-3910, fernanda.rodrigues@example.com.br
+39. Gabriela Santos, 36, (53) 93827-4910, gabriela.santos@example.net
+40. Isabela Souza, 80, (54) 98273-4910, isabela.souza@example.org
+41. Jéssica Gomes, 26, (55) 94827-3910, jessica.gomes@example.com
+42. Júlia Ribeiro, 49, (41) 93827-4910, julia.ribeiro@example.com.br
+43. Larissa Martins, 68, (42) 98273-4910, larissa.martins@example.net
+44. Laura Araujo, 32, (43) 94827-3910, laura.araujo@example.org
+45. Letícia Barbosa, 72, (44) 93827-4910, leticia.barbosa@example.com
+46. Livia Castro, 23, (45) 98273-4910, livia.castro@example.com.br
+47. Luana Mendes, 52, (46) 94827-3910, luana.mendes@example.net
+48. Manuela Cardoso, 77, (32) 93827-4910, manuela.cardoso@example.org
+49. Mariana Teixeira, 34, (33) 98273-4910, mariana.teixeira@example.com
+50. Marina Correia, 58, (34) 94827-3910, marina.correia@example.com.br
