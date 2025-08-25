@@ -38,7 +38,8 @@ Vale ressaltar que toda a minha evolução na linguagem Rust pode ser acompanhad
   - rand = 0.9.2
   - sha2 = 0.10.9
   - digest = 0.10
-  - hex 0.4
+  - hex = 0.4
+  - colored = 3
   Além, claro, dos pacotes da standard lib do Rust:
   - std::fs
   - std::net

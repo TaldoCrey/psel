@@ -1,9 +1,3 @@
-## 50 Linhas de Dados Aleatórios Gerados
-
-A seguir, apresentamos 50 linhas de dados gerados aleatoriamente, contendo nome, idade, telefone e e-mail, conforme solicitado. Os dados foram criados utilizando a biblioteca `Faker` em Python, que é uma ferramenta popular para a geração de dados de teste.
-
-Cada linha segue o formato: `Nome, Idade, Telefone, email`
-
 1.  Maria Oliveira, 53, (81) 95836-7492, joao.silva@example.com
 2.  João Santos, 25, (62) 93948-4728, maria.oliveira@example.com.br
 3.  Ana Souza, 42, (98) 98374-2619, jose.pereira@example.net
