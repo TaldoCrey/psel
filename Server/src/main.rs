@@ -232,7 +232,7 @@ fn route(request: Request, mut stream: TcpStream) {
 
         let (content_type, folder) = match file.as_str() {
             s if s.contains("html") || s == "" => {
-                ("text/html", "pages")
+                ("text/html;charset=utf-8", "pages")
             },
             s if s.contains("css") => {
                 ("text/css", "pages")
@@ -243,7 +243,7 @@ fn route(request: Request, mut stream: TcpStream) {
             s if s.contains("png") => {
                 ("image/png", "data")
             }
-            _ => ("text/html", "data")
+            _ => ("text/html;charset=utf-8", "data")
         };
 
         let path = format!("./{}/{}", folder, file);

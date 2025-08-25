@@ -1,3 +1,4 @@
+use std::fs;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::io::prelude::*;
@@ -85,7 +86,16 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
         let signature_key = match &*signature_key_guard {
             Some(s) => s.clone(),
             None => {
-                let response = "HTTP/1.1 503 SERVICE UNAVAIBLE\r\n\r\nProxy not ready";
+                let contents = fs::read_to_string("./pages/503.html").unwrap();
+                let response = format!(
+                    "HTTP/1.1 503 SERVICE UNAVAIBLE\r\n\
+                    Content-Length: {}\r\n\
+                    Content-Type: text/html, charset=\r\n\
+                    \r\n\
+                    {}",
+                    contents.len(),
+                    contents
+                );
                 stream.write(response.as_bytes()).unwrap();
                 stream.flush().unwrap();
                 return;
