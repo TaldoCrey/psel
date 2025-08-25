@@ -237,7 +237,7 @@ fn list_files() -> String {
 /// * `mut stream: TcpStream` - Stream that holds connection.
 fn route(request: Request, mut stream: TcpStream) {
     if request.method == "GET" {
-        report(format!("Sending to routed (GET) request a response"));
+        report(format!("Sending back routed (GET) request a response"));
         let file = match &request.uri {
             s if s.contains("?") => {
                 let (_, file_var_and_value) = request.uri.split_once("?").unwrap();
@@ -295,6 +295,8 @@ fn route(request: Request, mut stream: TcpStream) {
         }
         stream.write_all(response.as_bytes()).unwrap();
         stream.flush().unwrap();
+    } else if request.method == "POST" {
+        report(format!("Storing file of (POST) request [[under development]]"));
     }
 }
 
@@ -313,7 +315,7 @@ fn main() {
     let hash_as_bytes = hasher.finalize();
     let secret_key = hex::encode(hash_as_bytes);
 
-    report(format!("Secret Key Generated! >>> {}", &secret_key));
+    report(format!("Secret Key Generated! >>> {}", &secret_key[0..5]));
 
     while let Err(e) = register_with_proxy(&secret_key.as_str()) {
         eprintln!("[{}] {} {} >> {}", "SERVER".blue(), "::".yellow(), "Critical Error".red(),e);

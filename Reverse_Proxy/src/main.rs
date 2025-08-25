@@ -105,16 +105,16 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
 
         request.signature = signature_key;
 
-        proxy_foward(request, stream);
+        proxy_forward(request, stream);
     }
 }
 
-/// Passes Foward a request of a client to the server
+/// Passes Forward a request of a client to the server
 /// 
 /// # Arguments
 /// * `request: Request` - Countainer that holds request data.
 /// * `mut stream: TcpStream` - Stream that holds connection with client.
-fn proxy_foward(request: Request, mut stream: TcpStream) {
+fn proxy_forward(request: Request, mut stream: TcpStream) {
     if request.method == "GET" {
         let mut server_stream = TcpStream::connect("127.0.0.1:1445").unwrap();
         let server_request = format!(
@@ -128,12 +128,12 @@ fn proxy_foward(request: Request, mut stream: TcpStream) {
         server_stream.write(server_request.as_bytes()).unwrap();
         server_stream.flush().unwrap();
 
-        report(format!("Request passed foward"));
+        report(format!("Request passed forward"));
 
         let mut response_buffer = [0; 4096];
         server_stream.read(&mut response_buffer).unwrap();
 
-        report(format!("Received answer from Server >>> Passing Foward to Client"));
+        report(format!("Received answer from Server >>> Passing Forward to Client"));
 
         stream.write(&response_buffer).unwrap();
         stream.flush().unwrap();
@@ -142,8 +142,6 @@ fn proxy_foward(request: Request, mut stream: TcpStream) {
             "Strange Request >>> Method: {} | Path: {} | Body: {}", 
             request.method, request.uri, request.body
         ));
-
-
     }
 }
 
