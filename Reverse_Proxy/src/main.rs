@@ -150,13 +150,13 @@ fn proxy_forward(request: Request, mut stream: TcpStream) {
 
         let file_name = line.split_once("=").unwrap().1.replace('"', "");
 
-        let file_content = request.body.split_once("\r\n\r\n").unwrap().1.trim();
+        let file_content = request.body.split_once("\r\n\r\n").unwrap().1.split_once("\r\n").unwrap().0.trim_end_matches('\0').trim();
 
 
         let server_request = format!(
             "X-Proxy-Signature: {}\r\n{} {} HTTP/1.1\r\nHost: {}\r\nFile-Name: {}\r\nContent-Length: {}\r\n\r\n{}",
             request.signature,
-            request.method,
+            request.method, 
             request.uri,
             request.host,
             file_name,
