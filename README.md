@@ -3,7 +3,7 @@
 Opa, essa é a minha tentativa de passar o PSEL do Patos!
 
 ## Sobre Mim
-Antes dos detalhes técnicos, uma breve apresentação. Meu nome é Renan Machado Santos, atualmente estou no segundo semestre do BCC e tenho intenções de entrar para o PATOS visando aprender mais sobre open source e cybersec.
+Antes dos detalhes técnicos, uma breve apresentação. Meu nome é Renan Machado Santos, atualmente estou no segundo semestre do BCC e tenho intenções de entrar para o PATOS visando aprender mais sobre open source, cybersec e afins.
 
 ## Detalhes técnicos
 A linguagem utilizada neste repositório tanto para o server quanto para o reverse proxy será o Rust.
@@ -12,7 +12,7 @@ A linguagem utilizada neste repositório tanto para o server quanto para o rever
 Eu escolhi Rust pois queria me desafiar a aprender uma linguagem nova do zero e também pois das linguagens recomendadas pelo pessoal do PATOS, após uma breve pesquisa, Rust me parece uma das mais interessantes.
 Eu aprendi Rust totalmente do zero seguindo os vídeos gratuitos de um gringo, pelo site: https://learn.letsgetrusty.com
 
-Vale ressaltar que toda a minha evolução na linguagem Rust pode ser acompanhada pelo meu Repositório público: https://github.com/TaldoCrey/RustStudies.
+Vale ressaltar que toda a minha evolução na linguagem Rust pode ser acompanhada pelo meu Repositório público: https://github.com/TaldoCrey/RustStudies, o qual contém meus códigos do absoluto 0 em rust até um protótipo deste mesmo projeto.
 
 ### Features do Projeto
 #### Servidor
@@ -53,6 +53,19 @@ Vale ressaltar que toda a minha evolução na linguagem Rust pode ser acompanhad
 ## Minha jornada
 Fazer esse projeto foi meu primeiro contato com essa parte da web, eu já havia feito sites com html e css, mas só isso. Nunca tinha mexido com requisições e tudo mais.
 Antes de começar a estudar os fundamentos de rede, eu primeiro estudei a linguagem Rust (estudo esse que está todo documentado no repositório supracitado). Vendo os vídeos do gringo eu achei que ela tinha uma boa semelhança com C e achei que seria mais uma linguagem de programação útil de saber. Acaba que até o dado momento, Rust se tornou minha linguagem predileta, pois tem muitas funcionalidades que nunca tinha visto e poderosas. Depois de chegar em um bom tanto de conhecimento de Rust, decidir começar os estudos sobre o server e o reverse proxy em Rust.
+
 Sobre o aprendizado web, li os sites que o próprio Patos recomenda no readme do psel, mas confesso que quem me ajudou mesmo a entender tudo foi o Gemini Pro (cortesia do email institucional). Primeiro fui pedindo pra ele me explicar o que eram sockets, requests, parsing, um proxy e um reverse proxy. Depois disso, vi um vídeo do gringo ensinando a fazer um servidor single-thread. Testei, funcionou e daí pra frente foram 5 horas seguidas totalmente imerso na programação de um servidor e reverse proxy de teste. Pedi ajuda para o Gemini também para me ajudar a mexer com as libs que geram o SHA-256 pois não encontrei nenhum lugar que falasse muito resumidamente sobre isso. Além disso, a I.A. do google me ajudou a resolver alguns erros das minhas requests - que estavam dando errado e cagando tudo. Além disso, por não conseguir fazer uma página que me agradasse, também pedi pra ela fazer um index.html e um style.css pra eu usar (o que ferrou um pouco o routing precarizado das requests que eu tava fazendo).
-No meu server e reverse proxy de estudo, que ta no rep já citado, o código ta todo bagunçado e um regaço. Mas foi o suficiente pra eu entender a ideia do que eu preciso fazer pra chegar em um resultado minimamente decente pra apresentar para o psel. Mesmo agora tendo aprendido bastante coisa nova, sinto que ainda sou bastante leigo nessa questão de redes, mas minha motivação pra entrar no PATOS é justamente poder me aprofundar nessa área. Além disso, quero aprender sobre cybersec e acho que o PATOS vai ser um bom lugar pra isso!!!
+
+No meu server e reverse proxy de estudo, que ta no rep já citado, o código ta todo bagunçado e um regaço. Mas foi o suficiente pra eu entender a ideia do que eu preciso fazer pra chegar em um resultado minimamente decente pra apresentar para o psel. Mesmo agora tendo aprendido bastante coisa nova, sinto que ainda sou bastante leigo nessa questão de redes, mas minha motivação pra entrar no PATOS é justamente poder me aprofundar nessa área, rodeado de pessoas que entendem bem do assunto. Além disso, quero aprender sobre cybersec e acho que o PATOS vai ser um ótimo lugar para isso!!!
 Considero minha jornada "do 0 ao reverse proxy" um bom aprendizado no qual eu me diverti muito produzindo ele.
+
+### Algumas Fontes
+Vou listar algumas fontes que me ajudaram a coletar conhecimentos e produzir meu projeto:
+- https://doc.rust-lang.org/std/ -> Ajuda com alguns módulos da std
+- https://learn.letsgetrusty.com -> Aprender o básico de Rust
+- https://youtu.be/BHxmWTVFWxQ?si=mmlUYXunmAcU2gVL -> Aprender a fazer um server básico em Rust
+- https://developer.mozilla.org/pt-BR/docs/Web/HTTP -> Aprender algumas coisas sobre requests
+- Google Gemini Pro (Cortesia do email institucional):
+    - Uso da biblioteca sha2 para gerar um SHA-256 a partir de uma string
+    - Uso do ponteiro inteligente Arc pra armazenar o SHA-256 sem dar erro do borrowing checker por conta das threads
+    - Dúvidas gerais sobre especificidades relacionadas a requests padrões e personalizadas
