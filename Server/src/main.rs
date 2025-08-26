@@ -191,7 +191,7 @@ fn escape_html(text: &str) -> String{
     output
 }
 
-/// Replace a html file template by actually data
+/// Replace a html file template by actually data and returns it as a String
 /// 
 /// # Arguments
 /// * `html_template: &str` - Html file content that will suffer a replacement.
@@ -275,7 +275,22 @@ fn route(request: Request, mut stream: TcpStream) {
                 s if s == "" => {
                     list_files()
                 },
-                _ => fs::read_to_string(filepath).unwrap()
+                _ => {
+                    if !&file.ends_with(".css") {
+                        let file_content = fs::read_to_string(filepath).unwrap();
+                        let file_content = escape_html(&file_content);
+
+                        let index_with_files_listed = list_files();
+                        //let index_with_files_listed = escape_html(&index_with_files_listed);
+
+                        let index_w_fl_ofn = fill_template(&index_with_files_listed, "{{NOME_ARQUIVO_ABERTO}}", &file);
+                        //let index_w_fl_ofn = escape_html(&index_w_fl_ofn);
+                        fill_template(&index_w_fl_ofn, "{{CONTEUDO_ARQUIVO_ABERTO}}", &file_content)
+                    } else {
+                        fs::read_to_string(filepath).unwrap()
+                    }
+                    
+                }
             };
             
             response = format!(

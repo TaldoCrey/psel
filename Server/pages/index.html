@@ -7,28 +7,36 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
-    <div class="text-block">
+    <div class="file-search-block">
+        <div class="text-block">
 
-        <h1>File Searcher</h1>
+            <h1>File Searcher</h1>
 
-        <form action="/filesearch" method="GET">
+            <form action="/filesearch" method="GET">
 
-            <div class="form-group">
-                <label for="filename">Digite o nome do arquivo:</label>
-                <input type="text", id="filename", name="file_name", placeholder="ex: saudacao.txt" required>
-            </div>
+                <div class="form-group">
+                    <label for="filename">Digite o nome do arquivo:</label>
+                    <input type="text", id="filename", name="file_name", placeholder="ex: saudacao.txt" required>
+                </div>
 
-            <button type="submit">Procurar</button>
+                <button type="submit">Procurar</button>
 
-        </form>
+            </form>
 
+        </div>
+
+        <div class="filenames-text-block">
+            <h3>Lista de arquivos existentes:</h3>
+            <pre class="filenames">{{NOMES_DOS_ARQUIVOS}}</pre>
+        </div>
     </div>
 
-    <div class="filenames-text-block">
-        <h3>Lista de arquivos existentes:</h3>
-        <pre class="filenames">{{NOMES_DOS_ARQUIVOS}}</pre>
+    <div class="filecontent-text-block">
+        <h3>Conteúdo de {{NOME_ARQUIVO_ABERTO}}:</h3>
+        <pre class="filecontent">{{CONTEUDO_ARQUIVO_ABERTO}}</pre>
     </div>
+
+
 
 </body>
 </html>

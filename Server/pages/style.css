@@ -9,19 +9,28 @@ body {
     background-color: rgb(29, 0, 56);
     color: #d8d8d8;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
 }
 
+.file-search-block {
+    align-items: center;
+    justify-content: center;
+    min-width: 100%;
+    display: flex;
+    margin-bottom: 0.5rem;
+}
+
 .text-block {
     background-color: antiquewhite;
     padding: 2.5rem;
-    margin-inline: 0.25rem;
+    margin-inline: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 90%;
-    height: 20rem;
+    height: 19rem;
     max-width: 500px;
     text-align: center;
 }
@@ -32,32 +41,56 @@ h1 {
 }
 
 h3 {
-    margin-bottom: 3.5rem;
+    margin-bottom: 1rem;
     color: #1a2c4e
 }
 
 .filenames-text-block {
     background-color: antiquewhite;
-    padding: 2.5rem;
+    padding: 0.5rem;
     margin-inline: 0.25rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 90%;
-    height: 20rem;
+    height: 19rem;
     max-width: 500px;
     text-align: center;
 }
 
-.filenames {
-    color: #1a2c4e;
-    padding: 2.5rem;
+.filecontent-text-block {
+    background-color: antiquewhite;
+    padding: 0.5rem;
     margin-inline: 0.25rem;
     border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    height: 20rem;
+    min-width: 90%;
+    text-align: center;
+}
+
+.filecontent {
+    color: #1a2c4e;
+    min-width: fill;
+    width: 75rem;
+    text-align: center;
+    height: 16.5rem;
+    min-height: max-content;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+    scrollbar-width: thin;
+    scrollbar-color: #cda2f5;
+    text-align: left;
+}
+
+.filenames {
+    color: #1a2c4e;
+    border-radius: 12px;
     width: 100%;
-    height: 120px;
+    height: 15rem;
     max-width: 500px;
     text-align: center;
-    max-height: 80%;
+    max-height: max-content;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #cda2f5;
