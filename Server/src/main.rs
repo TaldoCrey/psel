@@ -156,14 +156,14 @@ fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
 
     let request = parse(request_string.to_string());
 
-    report(format!("Received new request => \nSignature: {}\nMethod: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
-                            request.signature, request.method, request.uri, request.host, request.body));
+    report(format!("Received new request => \nSignature: {}\nMethod: {}\nURI: {}\nHost: {}\nProvider: {}\n\nBody: {}\n",
+                            request.signature, request.method, request.uri, stream.peer_addr().unwrap(),request.host, request.body));
     
     if request.signature == secret.as_str() {
-        report(format!("Request Signature Validated >> Routing"));
+        report(format!("Request Signature Validated >>> Routing"));
         route(request, stream);
     } else {
-        report(format!("Request Signature is invalid >> Sending 403 Response"));
+        report(format!("Request Signature is invalid >>> Sending 403 Response"));
         let contents = fs::read_to_string("./pages/403.html").unwrap();
 
         let response = format!(
@@ -277,6 +277,7 @@ fn route(request: Request, mut stream: TcpStream) {
         let filepath = Path::new(path.as_str());
         let response;
         if filepath.exists() {
+            report(format!("Requested file ({}) was found >>> Sending response", &file));
             let contents = match file {
                 s if s == "" => {
                     let index_with_files_listed = list_files();
@@ -309,8 +310,10 @@ fn route(request: Request, mut stream: TcpStream) {
         } else {
             let contents = fs::read_to_string("./pages/404.html").unwrap();
 
+            report(format!("Requested file ({}) was not found >>> Sending 404 response", &file));
+
             response = format!(
-                "HTTP/1.1 404 NOT FOUND\r\nContent-Length: {}\r\nContent-Type: text/html\r\n{}",
+                "HTTP/1.1 404 NOT FOUND\r\nContent-Length: {}\r\nContent-Type: text/html\r\n\r\n{}",
                 contents.len(),
                 contents
             );
@@ -321,11 +324,12 @@ fn route(request: Request, mut stream: TcpStream) {
         report(format!("Storing file of (POST) request"));
         let mut path = format!("./data/{}", &request.file_name);
         let mut filepath = Path::new(&path);
-        let counter = 2;
+        let mut counter = 2;
         while filepath.exists() {
             let (name, extention) = request.file_name.split_once(".").unwrap();
             path = format!("./data/{}_{}.{}", name, counter, extention);
             filepath = Path::new(&path);
+            counter += 1;
         }
 
         let mut file = fs::File::create(filepath).unwrap();
@@ -380,7 +384,7 @@ fn main() {
 
     let listener =  TcpListener::bind("127.0.0.1:1445").unwrap();
 
-    report(format!("Initialized at 127.0.0.1:1445"));
+    report(format!("Initialized at {}", listener.local_addr().unwrap()));
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();

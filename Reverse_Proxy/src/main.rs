@@ -64,7 +64,7 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
     let mut buffer = [0; 4096];
     stream.read(&mut buffer).unwrap();
     let request_string = String::from_utf8_lossy(&buffer[..]);
-    
+
     let mut request = parse(request_string.to_string());
 
     if request.method == "POST" && request.uri == "/register-secret" {
@@ -87,8 +87,8 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
 
     } else {
         report(format!("Received new request => \n\
-                            Method: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
-                            request.method, request.uri, request.host, request.body));
+                            Method: {}\nURI: {}\nHost: {}\nProvider: {}\n\nBody: {}\n",
+                            request.method, request.uri, request.host, stream.peer_addr().unwrap(),request.body));
         let signature_key_guard = secret_state.lock().unwrap();
         let signature_key = match &*signature_key_guard {
             Some(s) => s.clone(),
@@ -123,8 +123,9 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
 /// * `mut stream: TcpStream` - Stream that holds connection with client.
 fn proxy_forward(request: Request, mut stream: TcpStream) {
     let mut server_stream = TcpStream::connect("127.0.0.1:1445").unwrap();
+    let server_request;
     if request.method == "GET" {
-        let server_request = format!(
+        server_request = format!(
             "X-Proxy-Signature: {}\r\n{} {} HTTP/1.1\r\nHost: {}\r\n\r\n{}",
             request.signature,
             request.method,
@@ -132,15 +133,7 @@ fn proxy_forward(request: Request, mut stream: TcpStream) {
             request.host,
             request.body
         );
-        server_stream.write(server_request.as_bytes()).unwrap();
-        server_stream.flush().unwrap();
 
-        report(format!("Request passed forward"));
-
-        io::copy(&mut server_stream, &mut stream).unwrap();
-        report(format!("Received answer from Server >>> Passing Forward to Client"));
-        stream.flush().unwrap();
-        
     } else if request.method == "POST" && request.uri == "/upload" {
 
         let line = request.body.lines().nth(1).unwrap().split("; ").nth(2).unwrap();
@@ -150,7 +143,7 @@ fn proxy_forward(request: Request, mut stream: TcpStream) {
         let file_content = request.body.split_once("\r\n\r\n").unwrap().1.split_once("\r\n").unwrap().0.trim_end_matches('\0').trim();
 
 
-        let server_request = format!(
+        server_request = format!(
             "X-Proxy-Signature: {}\r\n{} {} HTTP/1.1\r\nHost: {}\r\nFile-Name: {}\r\nContent-Length: {}\r\n\r\n{}",
             request.signature,
             request.method, 
@@ -161,27 +154,28 @@ fn proxy_forward(request: Request, mut stream: TcpStream) {
             file_content
         );
 
-        server_stream.write(server_request.as_bytes()).unwrap();
-        server_stream.flush().unwrap();
-
-        report(format!("Request passed forward"));
-
-        io::copy(&mut server_stream, &mut stream).unwrap();
-        report(format!("Received answer from Server >>> Passing Forward to Client"));
-        stream.flush().unwrap();
     } else {
         report(format!(
             "Strange Request >>> Method: {} | Path: {} | Body: {}", 
             request.method, request.uri, request.body
         ));
+        return;
     }
+    server_stream.write(server_request.as_bytes()).unwrap();
+    server_stream.flush().unwrap();
+
+    report(format!("Request ({}) successfuly forwarded", request.method));
+
+    io::copy(&mut server_stream, &mut stream).unwrap();
+    report(format!("Received answer from Server >>> Passing forward to Client"));
+    stream.flush().unwrap();
     server_stream.shutdown(std::net::Shutdown::Both).unwrap();
 }
 
 fn main() {
     let listener = TcpListener::bind("0.0.0.0:2006").unwrap();
 
-    report(format!("Initialized at 0.0.0.0:2006"));
+    report(format!("Initialized at {}", listener.local_addr().unwrap()));
 
     let secret_state: SharedSecret = Arc::new(Mutex::new(None));
 
