@@ -78,6 +78,11 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
         let response = "HTTP/1.1 200 OK\r\n\r\n";
         stream.write(response.as_bytes()).unwrap();
         stream.flush().unwrap();
+    } else if request.method == "GET" && request.uri == "/favicon.ico" {
+        report(format!("Client requested favicon.ico >>> Sending 204 response"));
+        let response = "HTTP/1.1 204 NO CONTENT\r\n\r\n";
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
     } else {
         report(format!("Received new request => \n\
                             Method: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
