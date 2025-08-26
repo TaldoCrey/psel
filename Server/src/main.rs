@@ -341,7 +341,7 @@ fn route(request: Request, mut stream: TcpStream) {
         };
 
         let response = format!(
-                "HTTP/1.1 201 CREATED\r\nContent-Type: text/html\r\nContent-Length: {}\r\n\r\n{}",
+                "HTTP/1.1 302 MOVED PERMANENTLY\r\nLocation:/\r\nContent-Type: text/html\r\nContent-Length: {}\r\n\r\n{}",
                 contents.len(),
                 contents
         );
