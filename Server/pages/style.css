@@ -21,18 +21,19 @@ body {
     min-width: 100%;
     display: flex;
     margin-bottom: 0.5rem;
+    padding: 0.5rem;
 }
 
 .text-block {
     background-color: antiquewhite;
     padding: 2.5rem;
-    margin-inline: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 90%;
+    width: 80%;
     height: 19rem;
-    max-width: 500px;
+    max-width: 90%;
     text-align: center;
+    margin-right: 0.5rem;
 }
 
 h1 {
@@ -48,13 +49,13 @@ h3 {
 .filenames-text-block {
     background-color: antiquewhite;
     padding: 0.5rem;
-    margin-inline: 0.25rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 90%;
+    width: 80%;
     height: 19rem;
-    max-width: 500px;
+    max-width: 90%;
     text-align: center;
+    margin-right: 0.5rem;
 }
 
 .filecontent-text-block {
@@ -66,6 +67,19 @@ h3 {
     height: 20rem;
     min-width: 90%;
     text-align: center;
+}
+
+.file-upload {
+    background-color: antiquewhite;
+    padding: 0.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    height: 19rem;
+    max-width: 90%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .filecontent {
@@ -139,4 +153,38 @@ button {
 button:hover {
     background-color: #2f2c57;
     color: #cda2f5;
+}
+
+.input-file {
+    display: none;
+}
+
+.handmade-button {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #2f2c57;
+    background-color: #cda2f5;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    margin-bottom: 3rem;
+}
+
+.handmade-button:hover {
+    background-color: #2f2c57;
+    color: #cda2f5;
+}
+
+#info-arquivo {
+    background-color: white;
+    color: #2f2c57;
+    border-radius: 8px;
+    border: 1px solid #2f2c57;
+}
+
+#upload-button {
+    margin-top: 3rem;
 }
