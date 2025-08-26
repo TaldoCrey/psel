@@ -67,6 +67,7 @@ fn register_with_proxy(secret: &str) -> Result<(), String> {
 
             if response_str.starts_with("HTTP/1.1 200 OK") {
                 report(format!("Secret Key has been setted up with proxy."));
+                stream.shutdown(std::net::Shutdown::Both).unwrap();
                 Ok(())
             } else {
                 Err(format!("Secret Key registration have failed. Proxy's answer: {}", response_str))

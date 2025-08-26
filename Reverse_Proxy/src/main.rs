@@ -1,4 +1,5 @@
 use std::fs;
+use std::io;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::io::prelude::*;
@@ -63,9 +64,7 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
     let mut buffer = [0; 4096];
     stream.read(&mut buffer).unwrap();
     let request_string = String::from_utf8_lossy(&buffer[..]);
-
-   
-
+    
     let mut request = parse(request_string.to_string());
 
     if request.method == "POST" && request.uri == "/register-secret" {
@@ -85,6 +84,7 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
         let response = "HTTP/1.1 204 NO CONTENT\r\n\r\n";
         stream.write(response.as_bytes()).unwrap();
         stream.flush().unwrap();
+
     } else {
         report(format!("Received new request => \n\
                             Method: {}\nURI: {}\nHost: {}\n\nBody: {}\n",
@@ -137,13 +137,10 @@ fn proxy_forward(request: Request, mut stream: TcpStream) {
 
         report(format!("Request passed forward"));
 
-        let mut response_buffer = [0; 4096];
-        server_stream.read(&mut response_buffer).unwrap();
-
+        io::copy(&mut server_stream, &mut stream).unwrap();
         report(format!("Received answer from Server >>> Passing Forward to Client"));
-
-        stream.write(&response_buffer).unwrap();
         stream.flush().unwrap();
+        
     } else if request.method == "POST" && request.uri == "/upload" {
 
         let line = request.body.lines().nth(1).unwrap().split("; ").nth(2).unwrap();
@@ -169,12 +166,8 @@ fn proxy_forward(request: Request, mut stream: TcpStream) {
 
         report(format!("Request passed forward"));
 
-        let mut response_buffer = [0; 4096];
-        server_stream.read(&mut response_buffer).unwrap();
-
+        io::copy(&mut server_stream, &mut stream).unwrap();
         report(format!("Received answer from Server >>> Passing Forward to Client"));
-
-        stream.write(&response_buffer).unwrap();
         stream.flush().unwrap();
     } else {
         report(format!(
@@ -182,6 +175,7 @@ fn proxy_forward(request: Request, mut stream: TcpStream) {
             request.method, request.uri, request.body
         ));
     }
+    server_stream.shutdown(std::net::Shutdown::Both).unwrap();
 }
 
 fn main() {
