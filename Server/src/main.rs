@@ -85,13 +85,15 @@ fn register_with_proxy(secret: &str) -> Result<(), String> {
 /// * `uri` - Request's path.
 /// * `host` - Request's host.
 /// * `body` - Request's body.
+/// * `file_name` - Request's file name.
 #[allow(dead_code)]
 struct Request {
     signature: String,
     method: String,
     uri: String,
     host: String,
-    body: String
+    body: String,
+    file_name: String,
 }
 
 /// Turn a request string into a struct
@@ -103,32 +105,35 @@ fn parse(request: String) -> Request {
     let host;
     let body;
     let proxy_signature;
+    let main_header;
+    let f_name;
     if request.contains("X-Proxy-Signature") {
         let proxy_signature_line = request.lines().nth(0).unwrap();
         proxy_signature = proxy_signature_line.split_once(": ").unwrap_or(("N/A", "N/A")).1;
-        let main_header = request.lines().skip(1).next().unwrap();
-        let mut parts = main_header.split_whitespace();
-        method = parts.next().unwrap();
-        path = parts.next().unwrap();
-        host = "0.0.0.0:2006";
-        body = request.split_once("\r\n\r\n").unwrap().1;
+        main_header = request.lines().skip(1).next().unwrap();
     } else {
         proxy_signature = "N/A";
-        let main_header = request.lines().next().unwrap();
-        let mut parts = main_header.split_whitespace();
-        method = parts.next().unwrap();
-        path = parts.next().unwrap();
-        host = "0.0.0.0:2006";
-        body = request.split_once("\r\n\r\n").unwrap().1;
+        main_header = request.lines().next().unwrap();
     }
-    
+
+    let mut parts = main_header.split_whitespace();
+    method = parts.next().unwrap();
+    path = parts.next().unwrap();
+    host = "0.0.0.0:2006";
+    body = request.split_once("\r\n\r\n").unwrap().1;
+    if method == "POST" && path == "/upload" {
+        f_name = request.lines().nth(3).unwrap().split_once(": ").unwrap().1;
+    } else {
+        f_name = "None file has been passed";
+    }
 
     Request {
         method: method.to_string(),
         signature: proxy_signature.to_string(),
         uri: path.to_string(),
         host: host.to_string(),
-        body: body.to_string()
+        body: body.to_string(),
+        file_name: f_name.to_string()
     }
 }
 
@@ -273,7 +278,10 @@ fn route(request: Request, mut stream: TcpStream) {
         if filepath.exists() {
             let contents = match file {
                 s if s == "" => {
-                    list_files()
+                    let index_with_files_listed = list_files();
+
+                    let index_w_fl_ofn = fill_template(&index_with_files_listed, "{{NOME_ARQUIVO_ABERTO}}", "N/A");
+                    fill_template(&index_w_fl_ofn, "{{CONTEUDO_ARQUIVO_ABERTO}}", "")
                 },
                 _ => {
                     if !&file.ends_with(".css") {
@@ -281,10 +289,8 @@ fn route(request: Request, mut stream: TcpStream) {
                         let file_content = escape_html(&file_content);
 
                         let index_with_files_listed = list_files();
-                        //let index_with_files_listed = escape_html(&index_with_files_listed);
 
                         let index_w_fl_ofn = fill_template(&index_with_files_listed, "{{NOME_ARQUIVO_ABERTO}}", &file);
-                        //let index_w_fl_ofn = escape_html(&index_w_fl_ofn);
                         fill_template(&index_w_fl_ofn, "{{CONTEUDO_ARQUIVO_ABERTO}}", &file_content)
                     } else {
                         fs::read_to_string(filepath).unwrap()
@@ -310,8 +316,40 @@ fn route(request: Request, mut stream: TcpStream) {
         }
         stream.write_all(response.as_bytes()).unwrap();
         stream.flush().unwrap();
-    } else if request.method == "POST" {
-        report(format!("Storing file of (POST) request [[under development]]"));
+    } else if request.method == "POST" && request.uri == "/upload" {
+        report(format!("Storing file of (POST) request"));
+        let mut path = format!("./data/{}", &request.file_name);
+        let mut filepath = Path::new(&path);
+        let counter = 2;
+        while filepath.exists() {
+            let (name, extention) = request.file_name.split_once(".").unwrap();
+            path = format!("./data/{}_{}.{}", name, counter, extention);
+            filepath = Path::new(&path);
+        }
+
+        let mut file = fs::File::create(filepath).unwrap();
+
+        file.write_all(request.body.as_bytes()).unwrap();
+
+        report(format!("Client's file has been created"));
+
+        let contents = {
+            let index_with_files_listed = list_files();
+
+            let index_w_fl_ofn = fill_template(&index_with_files_listed, "{{NOME_ARQUIVO_ABERTO}}", "N/A");
+            fill_template(&index_w_fl_ofn, "{{CONTEUDO_ARQUIVO_ABERTO}}", "")
+        };
+
+        let response = format!(
+                "HTTP/1.1 201 CREATED\r\nContent-Type: text/html\r\nContent-Length: {}\r\n\r\n{}",
+                contents.len(),
+                contents
+        );
+
+        report("Sending back response".to_string());
+
+        stream.write(&response.as_bytes()).unwrap();
+        stream.flush().unwrap();
     }
 }
 
