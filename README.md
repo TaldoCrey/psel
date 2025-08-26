@@ -33,8 +33,10 @@ Vale ressaltar que toda a minha evolução na linguagem Rust pode ser acompanhad
 - O reverse proxy está sendo hospedado em 0.0.0.0, o que possibilita que ele seja acessado pelo celular (achei que ia ser legal ver os arquivos pelo cel).
 
 ### Algumas especificações
+
+#### Libs usadas e estrutura de projeto
 - Foram feitos dois projetos utilizando o cargo: server e reverse-proxy, cada um deles armazenando seu respectivo sistema.
-- Dentro de cada projeto foram utilizadas as seguintes libs:
+- Dentro de cada projeto foram utilizadas as seguintes libs externas (dependencies):
   - rand = 0.9.2
   - sha2 = 0.10.9
   - digest = 0.10
@@ -43,12 +45,23 @@ Vale ressaltar que toda a minha evolução na linguagem Rust pode ser acompanhad
   Além, claro, dos pacotes da standard lib do Rust:
   - std::fs
   - std::net
-  - std::io::prelude;
+  - std::io;
   - std::thread
   - std::path
   - std::sync
 - As páginas .html estão todas dentro de uma pasta chamada /pages/, dentro do projeto do servidor.
 - Os arquivos que podem ser acessados devem estar dentro de uma pasta /data/, dentro do projeto do servidor.
+
+#### Manual de Uso
+Segue abaixo alguns detalhes sobre o uso deste projeto:
+- Inicie o Servidor e o Reverse Proxy (em qualquer ordem)
+  - Não esqueça de baixar as dependências do projeto antes de iniciá-lo.
+  - Recomenda-se iniciar ambos em dois terminais dividindo a mesma tela
+- Utilize o IPV4 da máquina que rodará o servidor para se conectar ao sistema por outros dispositivos que não sejam a máquina que roda o sistema
+- Utilize a porta 2006 para se conectar ao sistema
+- O sistema DEVE ser acessado pelo navegador
+- Caso deseje fazer upload de um arquivo, certifique-se que ele está na extensão '.txt' e que seu nome não possua espaços
+- O número máximo de dispostivos conectados depende do número de threads que sua máquina aguenta
 
 ## Minha jornada
 Fazer esse projeto foi meu primeiro contato com essa parte da web, eu já havia feito sites com html e css, mas só isso. Nunca tinha mexido com requisições e tudo mais.
