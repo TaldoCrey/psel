@@ -24,6 +24,35 @@ body {
     padding: 0.5rem;
 }
 
+@media (max-width: 600px) {
+    .file-search-block {
+        flex-direction: column;
+    }
+
+    .text-block {
+        margin-right: 0rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .filenames-text-block {
+        margin-right: 0rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .filecontent-text-block {
+        min-width: 50%;
+        margin-right: 0.5rem;
+    }
+
+    .file-upload{
+        margin-right: 0.5rem;
+    }
+
+    .filecontent {
+        min-width: 50%;
+    }
+}
+
 .text-block {
     background-color: antiquewhite;
     padding: 2.5rem;
@@ -56,6 +85,9 @@ h3 {
     max-width: 90%;
     text-align: center;
     margin-right: 0.5rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cda2f5;
 }
 
 .filecontent-text-block {
@@ -65,13 +97,15 @@ h3 {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     height: 20rem;
-    min-width: 90%;
+    width: 80%;
+    max-width: 90%;
     text-align: center;
+    overflow-y: auto;
 }
 
 .file-upload {
     background-color: antiquewhite;
-    padding: 0.5rem;
+    padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 80%;
@@ -84,16 +118,11 @@ h3 {
 
 .filecontent {
     color: #1a2c4e;
-    min-width: fill;
-    width: 75rem;
+    width: 80%;
+    max-width: 95%;
     text-align: center;
     height: 16.5rem;
     min-height: max-content;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overflow-wrap: break-word;
-    scrollbar-width: thin;
-    scrollbar-color: #cda2f5;
     text-align: left;
 }
 
@@ -105,9 +134,6 @@ h3 {
     max-width: 500px;
     text-align: center;
     max-height: max-content;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #cda2f5;
 }
 
 .form-group {
