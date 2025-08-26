@@ -69,7 +69,7 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
 
     if request.method == "POST" && request.uri == "/register-secret" {
         let body = request.body.trim().trim_end_matches('\0');
-
+        //Locks local thread to keep secret_key value
         let mut signature_key = secret_state.lock().unwrap();
         *signature_key = Some(body.to_string());
 
@@ -89,7 +89,9 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
         report(format!("Received new request => \n\
                             Method: {}\nURI: {}\nHost: {}\nProvider: {}\n\nBody: {}\n",
                             request.method, request.uri, request.host, stream.peer_addr().unwrap(),request.body));
+        //Secure that secret_state can be accessed by this local thread
         let signature_key_guard = secret_state.lock().unwrap();
+        //Access by reference the secret_key value from the lock_guard
         let signature_key = match &*signature_key_guard {
             Some(s) => s.clone(),
             None => {
@@ -108,6 +110,7 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
                 return;
             }
         };
+        //Unlock thread, realeasing secret_key common value from this thread
         drop(signature_key_guard);
 
         request.signature = signature_key;
@@ -141,7 +144,6 @@ fn proxy_forward(request: Request, mut stream: TcpStream) {
         let file_name = line.split_once("=").unwrap().1.replace('"', "");
 
         let file_content = request.body.split_once("\r\n\r\n").unwrap().1.split_once("\r\n").unwrap().0.trim_end_matches('\0').trim();
-
 
         server_request = format!(
             "X-Proxy-Signature: {}\r\n{} {} HTTP/1.1\r\nHost: {}\r\nFile-Name: {}\r\nContent-Length: {}\r\n\r\n{}",
@@ -177,10 +179,12 @@ fn main() {
 
     report(format!("Initialized at {}", listener.local_addr().unwrap()));
 
+    //Initializes the smart pointer that will hold the secret_key
     let secret_state: SharedSecret = Arc::new(Mutex::new(None));
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
+        //Creates new pointer to secret_state
         let secret_state_clone = Arc::clone(&secret_state);
         thread::spawn(move || {
             proxy_handler(stream, secret_state_clone);

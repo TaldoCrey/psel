@@ -178,7 +178,7 @@ fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
 
 }
 
-/// Secure texts that may be send in a html file
+/// Secure texts that will be send in a html file
 /// 
 /// # Arguments
 /// * `text: &str` - Text that will be secured.
@@ -197,7 +197,7 @@ fn escape_html(text: &str) -> String{
     output
 }
 
-/// Replace a html file template by actually data and returns it as a String
+/// Replace a html file's template by actually data and returns the whole html file content as a String
 /// 
 /// # Arguments
 /// * `html_template: &str` - Html file content that will suffer a replacement.
@@ -209,7 +209,7 @@ fn fill_template(html_template: &str, placeholder: &str, data: &str) -> String {
     html_template.replace(placeholder, &safe_data)
 }
 
-/// List all files in ````./data`` folder
+/// List all files in ```./data``` folder
 fn list_files() -> String {
     let path = Path::new("./data");
     let all_files = fs::read_dir(path).unwrap();
@@ -307,6 +307,7 @@ fn route(request: Request, mut stream: TcpStream) {
                 contents.len(),
                 contents
             );
+            
         } else {
             let contents = fs::read_to_string("./pages/404.html").unwrap();
 
@@ -320,6 +321,7 @@ fn route(request: Request, mut stream: TcpStream) {
         }
         stream.write_all(response.as_bytes()).unwrap();
         stream.flush().unwrap();
+
     } else if request.method == "POST" && request.uri == "/upload" {
         report(format!("Storing file of (POST) request"));
         let mut path = format!("./data/{}", &request.file_name);
@@ -367,7 +369,7 @@ fn main() {
     //Generates a random String
     let secret_key_string = generate_secret_key_string(16, SECRET_KEY_CHARSET);
     
-    //Made a SHA-256 key with random String data
+    //Make a SHA-256 key with random String data
     let mut hasher = Sha256::new();
     hasher.update(secret_key_string.as_bytes());
     let hash_as_bytes = hasher.finalize();
@@ -375,11 +377,13 @@ fn main() {
 
     report(format!("Secret Key Generated! >>> {}", &secret_key[0..5]));
 
+    //Server will keep trying to register secret_key on proxy until it succeeded
     while let Err(e) = register_with_proxy(&secret_key.as_str()) {
         eprintln!("[{}] {} {} >> {}", "SERVER".blue(), "::".yellow(), "Critical Error".red(),e);
         sleep(Duration::new(1, 0));
     }
 
+    //Initializes secret_key in a smart pointer to avoid borrowing checker issues
     let arc_secret_key = Arc::new(secret_key);
 
     let listener =  TcpListener::bind("127.0.0.1:1445").unwrap();
