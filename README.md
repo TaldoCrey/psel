@@ -62,7 +62,9 @@ Segue abaixo alguns detalhes sobre o uso deste projeto:
 - Utilize o IPV4 da máquina que rodará o servidor para se conectar ao sistema por outros dispositivos que não sejam a máquina que roda o sistema
 - Utilize a porta 2006 para se conectar ao sistema
 - O sistema DEVE ser acessado pelo navegador
-- Caso deseje fazer upload de um arquivo, certifique-se que ele está na extensão '.txt' e que seu nome não possua espaços
+- Caso deseje fazer upload de um arquivo, certifique-se que:
+  - A extensão do arquivo seja .txt
+  - O arquivo tenha no máximo 8 milcaracteres
 - O número máximo de dispostivos conectados depende do número de threads que sua máquina aguenta
 
 ## Minha jornada

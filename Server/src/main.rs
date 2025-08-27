@@ -32,7 +32,7 @@ fn generate_secret_key_string(size: usize, charset: &[u8]) -> String {
 /// 
 /// * `message: String` - Message that will be printed out.
 fn report(message: String) -> () {
-    println!("[{}] {} {}", "SERVER".blue(), "::".yellow(), message.truecolor(26, 164, 5));
+    println!("[{}] {} {}", "SERVER".blue(), "::".yellow(), message.truecolor(0, 255, 234));
 }
 
 /// Try to register a secret-key at proxy
@@ -149,7 +149,7 @@ fn parse(request: String) -> Request {
 /// sends the important parts of request to be routed. If the request has not the secret-key signature right,
 /// or does not have any secret-key signature, it sends a error back.
 fn handle_connection(mut stream: TcpStream, secret: Arc<String>) {
-    let mut buffer = [0; 4096];
+    let mut buffer = [0; 8192];
     stream.read(&mut buffer).unwrap();
 
     let request_string = String::from_utf8_lossy(&buffer[..]);
