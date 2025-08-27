@@ -52,6 +52,7 @@ Vale ressaltar que toda a minha evolução na linguagem Rust pode ser acompanhad
   - std::path
   - std::sync
 - As páginas .html estão todas dentro de uma pasta chamada /pages/, dentro do projeto do servidor.
+  - Com exceção das páginas de erro 502 e 503, que estão em uma pasta /pages/ dentro do projeto do proxy.
 - Os arquivos que podem ser acessados devem estar dentro de uma pasta /data/, dentro do projeto do servidor.
 
 #### Manual de Uso

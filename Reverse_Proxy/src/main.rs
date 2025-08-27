@@ -90,7 +90,24 @@ fn proxy_handler(mut stream: TcpStream, secret_state: SharedSecret) {
                             Method: {}\nURI: {}\nHost: {}\nProvider: {}\n\nBody: {}\n",
                             request.method, request.uri, request.host, stream.peer_addr().unwrap(),request.body));
         //Secure that secret_state can be accessed by this local thread
-        let signature_key_guard = secret_state.lock().unwrap();
+        let signature_key_guard = match secret_state.lock() {
+            Ok(guard) => guard,
+            Err(_) => {
+                let contents = fs::read_to_string("./pages/503.html").unwrap();
+                let response = format!(
+                    "HTTP/1.1 503 SERVICE UNAVAIBLE\r\n\
+                    Content-Length: {}\r\n\
+                    Content-Type: text/html;charset=utf-8\r\n\
+                    \r\n\
+                    {}",
+                    contents.len(),
+                    contents
+                );
+                stream.write(response.as_bytes()).unwrap();
+                stream.flush().unwrap();
+                panic!();
+            }
+        };
         //Access by reference the secret_key value from the lock_guard
         let signature_key = match &*signature_key_guard {
             Some(s) => s.clone(),
