@@ -4,6 +4,8 @@ Opa, essa é a minha tentativa de passar o PSEL do Patos!
 
 ## Sobre Mim
 Antes dos detalhes técnicos, uma breve apresentação. Meu nome é Renan Machado Santos, atualmente estou no segundo semestre do BCC e tenho intenções de entrar para o PATOS visando aprender mais sobre open source, cybersec e afins.
+Cel.: (17) 99616-9024
+Email: renanms@estudante.ufscar.br
 
 ## Detalhes técnicos
 A linguagem utilizada neste repositório tanto para o server quanto para o reverse proxy será o Rust.
